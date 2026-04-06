@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Check Dental - Registro de Paciente</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="card shadow mx-auto" style="max-width: 500px;">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Pre-Check Dental</h2>
+                <p class="text-muted text-center">Complete su historial antes de su cita</p>
+                
+                <form id="patientForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" id="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">¿Es alérgico a algún medicamento?</label>
+                        <textarea class="form-control" id="alergias" placeholder="Ej. Penicilina"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Motivo de la consulta</label>
+                        <select class="form-select" id="motivo">
+                            <option value="revision">Revisión General</option>
+                            <option value="dolor">Dolor Agudo</option>
+                            <option value="limpieza">Limpieza</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Enviar a mi Dentista</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
