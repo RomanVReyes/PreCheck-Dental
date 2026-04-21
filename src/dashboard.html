@@ -2,63 +2,149 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Administrativo - Pre-Check Dental</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Pre-Check Dental</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .sidebar { min-height: 100vh; background: #212529; color: white; }
+        .nav-link { color: rgba(255,255,255,.75); }
+        .nav-link:hover { color: white; }
+        .active-link { color: white !important; font-weight: bold; background: #0d6efd; border-radius: 5px; }
+    </style>
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="#">Panel Odontológico</a>
-        </div>
-    </nav>
+<body>
 
-    <div class="container">
-        <h3>Pacientes por Atender</h3>
-        <div class="table-responsive bg-white shadow-sm p-3">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Paciente</th>
-                        <th>Alergias</th>
-                        <th>Motivo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaPacientes">
-                    <tr>
-                        <td>Juan Pérez</td>
-                        <td class="text-danger">Penicilina</td>
-                        <td>Dolor Agudo</td>
-                        <td><button class="btn btn-sm btn-outline-primary">Ver Historial</button></td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 sidebar p-3 shadow">
+                <h4 class="text-center text-primary mb-4">Dr. Panel</h4>
+                <hr>
+                <ul class="nav flex-column">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link active-link" href="#" id="btn-prospectos">Nuevas Solicitudes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="btn-expedientes">Mi Librería (Pacientes)</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <main class="col-md-10 p-4">
+                
+                <div id="vista-prospectos">
+                    <h2 class="mb-4">Nuevas Solicitudes (Pre-Check)</h2>
+                    <div class="table-responsive">
+                        <table class="table table-hover shadow-sm bg-white rounded">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Teléfono</th>
+                                    <th>Motivo</th>
+                                    <th>Alerta Médica</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-prospectos">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="vista-expedientes" class="d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Librería de Pacientes</h2>
+                        <div class="input-group w-25">
+                            <input type="text" class="form-control" placeholder="Buscar paciente..." id="busquedaPaciente">
+                        </div>
+                    </div>
+                    <div id="contenedor-expedientes" class="row row-cols-1 row-cols-md-3 g-4">
+                        </div>
+                </div>
+
+                <div class="modal fade" id="modalExpediente" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="tituloExpediente">Expediente Clínico</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <ul class="nav nav-tabs mb-3" id="pestañasExpediente" role="tablist">
+                                    <li class="nav-item">
+                                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-perfil">Perfil y Alertas</button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-odontograma">Odontograma</button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-presupuesto">Presupuesto</button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-citas">Historial y Citas</button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content p-3 border border-top-0 rounded-bottom">
+                                    <div class="tab-pane fade show active" id="tab-perfil">
+                                        <div class="row">
+                                            <div class="col-md-6" id="detalle-perfil"></div>
+                                            <div class="col-md-6">
+                                                <div class="alert alert-warning" id="detalle-alertas">
+                                                    <strong>Alertas Médicas:</strong> <span id="texto-alergias"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade text-center" id="tab-odontograma">
+                                        <p class="text-muted">Módulo de Odontograma Interactivo (En desarrollo)</p>
+                                        <div class="bg-light p-5 rounded"> [Mapa Dental Visual Aquí] </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tab-presupuesto">
+                                        <h5>Plan de Tratamiento Sugerido</h5>
+                                        <table class="table table-sm">
+                                            <thead><tr><th>Concepto</th><th>Costo</th><th>Estatus</th></tr></thead>
+                                            <tbody id="tabla-presupuesto"></tbody>
+                                        </table>
+                                        <button class="btn btn-primary btn-sm">+ Agregar Procedimiento</button>
+                                    </div>
+                                    <div class="tab-pane fade" id="tab-citas">
+                                        <ul class="list-group list-group-flush" id="lista-citas"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
         </div>
     </div>
-</body>
-</html>
 
-<script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyDfjWWw2dW4mEhgLG_7wSKmQQCh4gck6lU",
-        authDomain: "precheck-dental.firebaseapp.com",
-        projectId: "precheck-dental",
-        storageBucket: "precheck-dental.firebasestorage.app",
-        messagingSenderId: "893834959540",
-        appId: "1:893834959540:web:84cd5fcbd1489d398e95e1"
-      };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfjWWw2dW4mEhgLG_7wSKmQQCh4gck6lU",
+            authDomain: "precheck-dental.firebaseapp.com",
+            projectId: "precheck-dental",
+            storageBucket: "precheck-dental.firebasestorage.app",
+            messagingSenderId: "893834959540",
+            appId: "1:893834959540:web:84cd5fcbd1489d398e95e1"
+        };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-      window.db = db;
-      window.collection = collection;
-      window.getDocs = getDocs;
+        // Exportamos variables al objeto window para usarlas en dashboard.js
+        window.db = db;
+        window.getDocs = getDocs;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
     </script>
-    
     <script src="dashboard.js"></script>
 </body>
 </html>
