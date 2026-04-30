@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dr. Panel - Pre-Check Dental</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="src/css/dashboard.css">
+
     <style>
         .sidebar { min-height: 100vh; background: #212529; color: white; }
         .nav-link { color: rgba(255,255,255,.75); cursor: pointer; transition: 0.2s; }
@@ -73,12 +76,69 @@
 
                 <div id="vista-citas" class="vista-seccion">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Agenda de Hoy</h2>
-                        <button class="btn btn-primary">+ Nueva Cita Manual</button>
+                        <h2>Agenda de Citas</h2>
+                        <div>
+                            <button class="btn btn-outline-secondary me-2" id="btn-config-horario">⚙️ Horario Base</button>
+                            <button class="btn btn-primary">+ Nueva Cita Manual</button>
+                        </div>
                     </div>
-                    <div class="card shadow-sm border-0 p-5 text-center text-muted">
-                        <h4>No hay citas programadas para hoy</h4>
-                        <p>Las citas aceptadas aparecerán en esta lista.</p>
+
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-2 rounded shadow-sm border">
+                                <div class="d-flex align-items-center gap-3">
+                                    <button class="btn btn-light border btn-sm" id="btn-dia-anterior">◀</button>
+                                    <button class="btn btn-light border btn-sm" id="btn-dia-siguiente">▶</button>
+                                    <h4 class="mb-0 text-dark fw-bold ms-2" id="titulo-rango-fechas">Hoy</h4>
+                                </div>
+                                
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="vistaBtn" id="btn-vista-dia" checked>
+                                    <label class="btn btn-outline-primary btn-sm" for="btn-vista-dia">Día</label>
+
+                                    <input type="radio" class="btn-check" name="vistaBtn" id="btn-vista-semana">
+                                    <label class="btn btn-outline-primary btn-sm" for="btn-vista-semana">Semana</label>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded shadow-sm border p-3">
+                                <div id="calendario-grid">
+                                    </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="bg-white rounded shadow-sm border p-3 mb-3">
+                                <h6 class="fw-bold text-center mb-3" id="titulo-mini-calendario">Mes Año</h6>
+                                <div id="mini-calendario-grid">
+                                    </div>
+                            </div>
+
+                            <div class="bg-white rounded shadow-sm border p-3">
+                                <h6 class="fw-bold mb-3">Estado de citas</h6>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="legend-color color-agendada me-2"></span>
+                                    <span class="text-muted small">Cita agendada</span>
+                                </div>
+
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="legend-color color-noCita me-2"></span>
+                                    <span class="text-muted small">Sin agendar</span>
+                                </div>
+
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="legend-color color-inhabil me-2"></span>
+                                    <span class="text-muted small">Inhabil</span>
+                                </div>
+                                
+                            </div>
+
+                            <div class="bg-white rounded shadow-sm border p-3">
+                                <h6 class="fw-bold mb-3">Siguientes Pacientes</h6>
+                                <p class="text-muted small">Aquí podemos listar un resumen rápido del día.</p>
+                            </div>
+                            
+                        </div>
                     </div>
                 </div>
 
@@ -154,6 +214,26 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/pages/admin.js"></script>
+
+<div class="modal fade" id="modalHorarioBase" tabindex="-1" aria-labelledby="modalHorarioBaseLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalHorarioBaseLabel">⚙️ Configurar Horario Base</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Define el horario estándar de tu semana. Los días marcados como "Inhábil" o las horas fuera del rango aparecerán bloqueadas.</p>
+                <div id="contenedor-horario-base">
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-horario">Guardar Horario</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

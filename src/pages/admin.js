@@ -1,4 +1,5 @@
 import { obtenerProspectos, obtenerExpedientes, validarYCrearExpediente } from '../services/clinicalService.js';
+import { renderizarCalendarioVacio } from '../modules/calendar-ui.js';
 
 // --- SISTEMA DE NAVEGACIÓN UX ---
 const vistas = ['inicio', 'solicitudes', 'citas', 'expedientes'];
@@ -26,7 +27,7 @@ function cambiarVista(vistaDestino) {
     if (vistaDestino === 'solicitudes') renderizarProspectos();
     if (vistaDestino === 'expedientes') renderizarExpedientes();
     if (vistaDestino === 'citas') {
-        // En el futuro: renderizarCitas();
+        renderizarCalendarioVacio();
     }
 }
 
