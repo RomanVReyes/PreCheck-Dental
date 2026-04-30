@@ -1,4 +1,4 @@
-import { db, collection, getDocs, addDoc, deleteDoc, doc } from '../core/firebase.js';
+import { db, collection, getDocs, addDoc, deleteDoc, doc, setDoc, getDoc } from '../core/firebase.js';
 
 export async function obtenerProspectos() {
     const querySnapshot = await getDocs(collection(db, "prospectos"));
@@ -29,4 +29,33 @@ export async function validarYCrearExpediente(idProspecto) {
 
     // 4. Eliminar prospecto
     await deleteDoc(doc(db, "prospectos", idProspecto));
+}
+
+// --- NUEVAS FUNCIONES PARA EL CALENDARIO ---
+
+export async function obtenerHorarioBase() {
+    try {
+        const docRef = doc(db, "configuracion", "horarioBase");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data();
+        } else {
+            return null; 
+        }
+    } catch (error) {
+        console.error("Error al obtener horario base:", error);
+        throw error;
+    }
+}
+
+export async function guardarHorarioBaseDB(nuevoHorario) {
+    try {
+        const docRef = doc(db, "configuracion", "horarioBase");
+        // setDoc sobrescribe el documento o lo crea si no existe
+        await setDoc(docRef, nuevoHorario); 
+    } catch (error) {
+        console.error("Error al guardar horario base:", error);
+        throw error;
+    }
 }

@@ -1,4 +1,5 @@
 // src/modules/calendar-ui.js
+import { obtenerHorarioBase, guardarHorarioBaseDB } from '../services/clinicalService.js';
 
 // Estado del calendario
 let fechaNavegacion = new Date(); 
@@ -9,19 +10,30 @@ const HORA_FIN = 22;
 
 const nombresDias = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
 
-// ESTADO: Horario Base Semanal
+// ESTADO: Horario Base Semanal por defecto (se sobrescribe si hay en DB)
 let horarioBase = {
-    0: { inhabil: false, inicio: 8, fin: 22 },  // DOMINGO
-    1: { inhabil: false, inicio: 9, fin: 19 }, // LUNES
-    2: { inhabil: false, inicio: 9, fin: 19 }, // MARTES
-    3: { inhabil: false, inicio: 9, fin: 19 }, // MIÉRCOLES
-    4: { inhabil: false, inicio: 9, fin: 19 }, // JUEVES
-    5: { inhabil: false, inicio: 9, fin: 19 }, // VIERNES
-    6: { inhabil: false, inicio: 10, fin: 14 } // SÁBADO
+    0: { inhabil: false, inicio: 8, fin: 22 },  
+    1: { inhabil: false, inicio: 9, fin: 19 }, 
+    2: { inhabil: false, inicio: 9, fin: 19 }, 
+    3: { inhabil: false, inicio: 9, fin: 19 }, 
+    4: { inhabil: false, inicio: 9, fin: 19 }, 
+    5: { inhabil: false, inicio: 9, fin: 19 }, 
+    6: { inhabil: false, inicio: 10, fin: 14 } 
 };
 
-export function renderizarCalendarioVacio() {
+export async function renderizarCalendarioVacio() {
     configurarEventosControles();
+    
+    try {
+        // Obtenemos los datos de Firebase al cargar
+        const datosDB = await obtenerHorarioBase();
+        if (datosDB) {
+            horarioBase = datosDB;
+        }
+    } catch (error) {
+        console.error("Error cargando DB, usando horario por defecto.", error);
+    }
+
     actualizarVista();
     renderizarMiniCalendario();
 }
@@ -105,19 +117,16 @@ function actualizarVista() {
     }
 }
 
-// --- GENERADORES DE VISTA PRINCIPAL MODIFICADOS ---
 function generarVistaDia() {
     const contenedor = document.createElement('div');
     contenedor.className = 'calendario-contenedor';
     
-    // Obtener la configuración del día seleccionado
     const diaIndex = fechaNavegacion.getDay();
-    const configDia = horarioBase[diaIndex];
+    const configDia = horarioBase[diaIndex] || { inhabil: false, inicio: HORA_INICIO, fin: HORA_FIN }; // Fallback
 
     for (let i = HORA_INICIO; i <= HORA_FIN; i++) {
         const horaStr = `${i.toString().padStart(2, '0')}:00`;
         
-        // Determinar si la celda debe ser gris (Inhábil o fuera de horario)
         const esInhabil = configDia.inhabil || i < configDia.inicio || i >= configDia.fin;
         const claseColor = esInhabil ? 'zona-inhabil' : '';
         const funcionClic = esInhabil ? '' : `onclick="alert('Clic en ${horaStr}')"`;
@@ -169,10 +178,9 @@ function generarVistaSemana() {
 
     diasSemana.forEach((dia, index) => {
         let colDia = `<div class="columna-dia">`;
-        const configDia = horarioBase[dia.getDay()]; // Traemos la configuración de este día
+        const configDia = horarioBase[dia.getDay()] || { inhabil: false, inicio: HORA_INICIO, fin: HORA_FIN }; 
 
         for (let i = HORA_INICIO; i <= HORA_FIN; i++) {
-            // Evaluamos si pinta gris
             const esInhabil = configDia.inhabil || i < configDia.inicio || i >= configDia.fin;
             const claseColor = esInhabil ? 'zona-inhabil' : '';
             const funcionClic = esInhabil ? '' : `onclick="alert('Clic Día ${index+1}, Hora ${i}:00')"`;
@@ -187,7 +195,6 @@ function generarVistaSemana() {
     return contenedor;
 }
 
-// --- LÓGICA DE LA MODAL DE HORARIO BASE ---
 function abrirModalHorario() {
     const contenedor = document.getElementById('contenedor-horario-base');
     contenedor.innerHTML = '';
@@ -195,7 +202,7 @@ function abrirModalHorario() {
     const diasNombresCompletos = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     
     for(let i=0; i<7; i++) {
-        const config = horarioBase[i];
+        const config = horarioBase[i] || { inhabil: false, inicio: HORA_INICIO, fin: HORA_FIN };
         contenedor.innerHTML += `
             <div class="row mb-2 align-items-center bg-light p-2 rounded border-bottom">
                 <div class="col-3 fw-bold">${diasNombresCompletos[i]}</div>
@@ -214,7 +221,6 @@ function abrirModalHorario() {
         `;
     }
 
-    // Evento para deshabilitar los inputs de hora si se marca "Inhábil"
     document.querySelectorAll('.check-inhabil').forEach(chk => {
         chk.addEventListener('change', (e) => {
             const dia = e.target.dataset.dia;
@@ -223,29 +229,51 @@ function abrirModalHorario() {
         });
     });
 
-    // Usando el API global de Bootstrap para mostrar la modal
     const modal = new bootstrap.Modal(document.getElementById('modalHorarioBase'));
     modal.show();
 }
 
-function guardarHorarioBase() {
-    // Recolectar datos
-    for(let i=0; i<7; i++) {
-        horarioBase[i].inhabil = document.getElementById(`inhabil-${i}`).checked;
-        horarioBase[i].inicio = parseInt(document.getElementById(`inicio-${i}`).value);
-        horarioBase[i].fin = parseInt(document.getElementById(`fin-${i}`).value);
+// Convertida a async para interactuar con DB
+async function guardarHorarioBase() {
+    const btn = document.getElementById('btn-guardar-horario');
+    const textoOriginal = btn.innerText;
+
+    try {
+        btn.innerText = "Guardando...";
+        btn.disabled = true;
+
+        const nuevoHorario = {};
+        for(let i=0; i<7; i++) {
+            // Se guardan como "0", "1", "2" lo cual Firestore mapea perfectamente
+            nuevoHorario[i.toString()] = {
+                inhabil: document.getElementById(`inhabil-${i}`).checked,
+                inicio: parseInt(document.getElementById(`inicio-${i}`).value),
+                fin: parseInt(document.getElementById(`fin-${i}`).value)
+            };
+        }
+        
+        // Guardamos en Firestore
+        await guardarHorarioBaseDB(nuevoHorario);
+        
+        // Actualizamos estado local
+        horarioBase = nuevoHorario;
+        
+        // Ocultamos modal
+        const modalEl = document.getElementById('modalHorarioBase');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        modalInstance.hide();
+        
+        // Refrescamos interfaz
+        actualizarVista();
+
+    } catch (error) {
+        alert("Ocurrió un error al guardar el horario.");
+    } finally {
+        btn.innerText = textoOriginal;
+        btn.disabled = false;
     }
-    
-    // Ocultar modal
-    const modalEl = document.getElementById('modalHorarioBase');
-    const modalInstance = bootstrap.Modal.getInstance(modalEl);
-    modalInstance.hide();
-    
-    // Refrescar el calendario con los nuevos colores
-    actualizarVista();
 }
 
-// --- MINI CALENDARIO (Sin cambios) ---
 function renderizarMiniCalendario() {
     const contenedor = document.getElementById('mini-calendario-grid');
     const titulo = document.getElementById('titulo-mini-calendario');
