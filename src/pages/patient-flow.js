@@ -1,7 +1,5 @@
 import { guardarProspecto, buscarPacienteRecurrente } from '../services/patientService.js';
 
-// Como usamos modules, las funciones no son globales. 
-// Las exponemos a 'window' solo para los botones HTML (onclick="mostrarSeccion(...)")
 window.mostrarSeccion = (idSeccion) => {
     document.getElementById('seccion-bienvenida').classList.add('d-none');
     document.getElementById('seccion-nuevo').classList.add('d-none');
@@ -9,7 +7,6 @@ window.mostrarSeccion = (idSeccion) => {
     document.getElementById(idSeccion).classList.remove('d-none');
 };
 
-// Formulario Nuevo
 document.getElementById('formNuevo').addEventListener('submit', async (e) => {
     e.preventDefault();
     const nuevoPaciente = {
@@ -33,7 +30,6 @@ document.getElementById('formNuevo').addEventListener('submit', async (e) => {
     }
 });
 
-// Formulario Recurrente
 document.getElementById('formRecurrente').addEventListener('submit', async (e) => {
     e.preventDefault();
     const tel = document.getElementById('telBusqueda').value;

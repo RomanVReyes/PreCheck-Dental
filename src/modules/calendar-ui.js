@@ -1,7 +1,5 @@
-// src/modules/calendar-ui.js
 import { obtenerHorarioBase, guardarHorarioBaseDB } from '../services/clinicalService.js';
 
-// Estado del calendario
 let fechaNavegacion = new Date(); 
 let fechaMiniCalendario = new Date(); 
 let vistaActual = 'dia'; 
@@ -10,7 +8,6 @@ const HORA_FIN = 22;
 
 const nombresDias = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
 
-// ESTADO: Horario Base Semanal por defecto (se sobrescribe si hay en DB)
 let horarioBase = {
     0: { inhabil: false, inicio: 8, fin: 22 },  
     1: { inhabil: false, inicio: 9, fin: 19 }, 
@@ -25,7 +22,6 @@ export async function renderizarCalendarioVacio() {
     configurarEventosControles();
     
     try {
-        // Obtenemos los datos de Firebase al cargar
         const datosDB = await obtenerHorarioBase();
         if (datosDB) {
             horarioBase = datosDB;
@@ -68,7 +64,6 @@ function configurarEventosControles() {
         renderizarMiniCalendario();
     });
 
-    // --- EVENTOS DE CONFIGURACIÓN DE HORARIO ---
     document.getElementById('btn-config-horario').addEventListener('click', abrirModalHorario);
     document.getElementById('btn-guardar-horario').addEventListener('click', guardarHorarioBase);
 }
@@ -233,7 +228,6 @@ function abrirModalHorario() {
     modal.show();
 }
 
-// Convertida a async para interactuar con DB
 async function guardarHorarioBase() {
     const btn = document.getElementById('btn-guardar-horario');
     const textoOriginal = btn.innerText;
@@ -244,7 +238,6 @@ async function guardarHorarioBase() {
 
         const nuevoHorario = {};
         for(let i=0; i<7; i++) {
-            // Se guardan como "0", "1", "2" lo cual Firestore mapea perfectamente
             nuevoHorario[i.toString()] = {
                 inhabil: document.getElementById(`inhabil-${i}`).checked,
                 inicio: parseInt(document.getElementById(`inicio-${i}`).value),
@@ -252,18 +245,14 @@ async function guardarHorarioBase() {
             };
         }
         
-        // Guardamos en Firestore
         await guardarHorarioBaseDB(nuevoHorario);
         
-        // Actualizamos estado local
         horarioBase = nuevoHorario;
         
-        // Ocultamos modal
         const modalEl = document.getElementById('modalHorarioBase');
         const modalInstance = bootstrap.Modal.getInstance(modalEl);
         modalInstance.hide();
         
-        // Refrescamos interfaz
         actualizarVista();
 
     } catch (error) {

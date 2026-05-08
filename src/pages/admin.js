@@ -1,12 +1,10 @@
 import { obtenerProspectos, obtenerExpedientes, validarYCrearExpediente } from '../services/clinicalService.js';
 import { renderizarCalendarioVacio } from '../modules/calendar-ui.js';
 
-// --- SISTEMA DE NAVEGACIÓN UX ---
 const vistas = ['inicio', 'solicitudes', 'citas', 'expedientes'];
 
 function cambiarVista(vistaDestino) {
     vistas.forEach(vista => {
-        // Manejo de botones (Sidebar)
         const btn = document.getElementById(`btn-${vista}`);
         if (vista === vistaDestino) {
             btn.classList.add('active-link');
@@ -14,7 +12,6 @@ function cambiarVista(vistaDestino) {
             btn.classList.remove('active-link');
         }
 
-        // Manejo de secciones (Main Content)
         const seccion = document.getElementById(`vista-${vista}`);
         if (vista === vistaDestino) {
             seccion.classList.add('vista-activa');
@@ -23,7 +20,6 @@ function cambiarVista(vistaDestino) {
         }
     });
 
-    // Cargar datos dependiendo de la vista para no saturar Firebase
     if (vistaDestino === 'solicitudes') renderizarProspectos();
     if (vistaDestino === 'expedientes') renderizarExpedientes();
     if (vistaDestino === 'citas') {
@@ -31,14 +27,12 @@ function cambiarVista(vistaDestino) {
     }
 }
 
-// Asignar eventos a los botones del menú
 document.getElementById('btn-inicio').addEventListener('click', () => cambiarVista('inicio'));
 document.getElementById('btn-solicitudes').addEventListener('click', () => cambiarVista('solicitudes'));
 document.getElementById('btn-citas').addEventListener('click', () => cambiarVista('citas'));
 document.getElementById('btn-expedientes').addEventListener('click', () => cambiarVista('expedientes'));
 
 
-// --- FUNCIONES DE RENDERIZADO ---
 
 async function renderizarProspectos() {
     const tabla = document.getElementById('tabla-prospectos');
@@ -72,13 +66,12 @@ async function renderizarProspectos() {
     }
 }
 
-// Acción de Validar
 window.validarPaciente = async (id) => {
     if (!confirm("¿Deseas convertir este prospecto en un expediente oficial y pasarlo a tu librería?")) return;
     try {
         await validarYCrearExpediente(id);
         alert("¡Paciente agregado con éxito!");
-        renderizarProspectos(); // Recarga la tabla
+        renderizarProspectos();
     } catch (error) {
         console.error("Error al validar:", error);
         alert("Hubo un error al procesar al paciente.");
@@ -145,6 +138,3 @@ window.abrirExpediente = (id) => {
     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
     modalInstance.show();
 };
-
-// Inicialización: Ya no llamamos a renderizarProspectos() aquí directamente. 
-// La vista 'inicio' está activa por defecto en el HTML, no requiere carga de Firebase por ahora.
