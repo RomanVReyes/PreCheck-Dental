@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dr. Panel - Pre-Check Dental</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
     <link rel="stylesheet" href="src/css/dashboard.css">
-
     <style>
         .sidebar { min-height: 100vh; background: #212529; color: white; }
         .nav-link { color: rgba(255,255,255,.75); cursor: pointer; transition: 0.2s; }
@@ -30,7 +28,11 @@
                         <a class="nav-link active-link" id="btn-inicio">🏠 Inicio General</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="btn-solicitudes">📩 Solicitudes Nuevas</a>
+                        <a class="nav-link" id="btn-solicitudes">
+                            📩 Solicitudes Nuevas
+                            <!-- Badge de citas pendientes (lo rellena admin.js) -->
+                            <span class="badge bg-warning text-dark ms-1 d-none" id="badge-citas-pendientes"></span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="btn-citas">📅 Citas Agendadas</a>
@@ -42,7 +44,8 @@
             </nav>
 
             <main class="col-md-10 offset-md-2 p-4" style="margin-left: 250px; width: calc(100% - 250px);">
-                
+
+                <!-- INICIO -->
                 <div id="vista-inicio" class="vista-seccion vista-activa">
                     <h2 class="mb-4">Resumen de tu Clínica</h2>
                     <div class="row g-4">
@@ -55,31 +58,74 @@
                     </div>
                 </div>
 
+                <!-- SOLICITUDES -->
                 <div id="vista-solicitudes" class="vista-seccion">
-                    <h2 class="mb-4">Nuevas Solicitudes (Pre-Check)</h2>
-                    <div class="table-responsive">
-                        <table class="table table-hover shadow-sm bg-white rounded align-middle">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Paciente</th>
-                                    <th>Teléfono</th>
-                                    <th>Motivo</th>
-                                    <th>Alerta Médica</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-prospectos">
-                                </tbody>
-                        </table>
+                    <h2 class="mb-4">Solicitudes Nuevas</h2>
+
+                    <!-- Tab: Prospectos / Citas pendientes -->
+                    <ul class="nav nav-tabs mb-3" id="tabs-solicitudes" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" id="tab-prospectos-btn"
+                                data-bs-toggle="tab" data-bs-target="#tab-prospectos">
+                                👤 Pacientes Nuevos
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="tab-citas-pendientes-btn"
+                                data-bs-toggle="tab" data-bs-target="#tab-citas-pend">
+                                📅 Solicitudes de Cita
+                                <span class="badge bg-warning text-dark ms-1 d-none" id="badge-tab-pendientes"></span>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Pestaña: Prospectos -->
+                        <div class="tab-pane fade show active" id="tab-prospectos">
+                            <div class="table-responsive">
+                                <table class="table table-hover shadow-sm bg-white rounded align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Paciente</th>
+                                            <th>Teléfono</th>
+                                            <th>Motivo</th>
+                                            <th>Alerta Médica</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-prospectos"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pestaña: Citas pendientes de confirmar -->
+                        <div class="tab-pane fade" id="tab-citas-pend">
+                            <div class="table-responsive">
+                                <table class="table table-hover shadow-sm bg-white rounded align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Paciente</th>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th>Tipo / Motivo</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-citas-pendientes"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                <!-- CITAS -->
                 <div id="vista-citas" class="vista-seccion">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2>Agenda de Citas</h2>
                         <div>
                             <button class="btn btn-outline-secondary me-2" id="btn-config-horario">⚙️ Horario Base</button>
-                            <button class="btn btn-primary">+ Nueva Cita Manual</button>
+                            <!-- ID añadido para que appointment-modal.js lo encuentre -->
+                            <button class="btn btn-primary" id="btn-nueva-cita-manual">+ Nueva Cita Manual</button>
                         </div>
                     </div>
 
@@ -91,57 +137,58 @@
                                     <button class="btn btn-light border btn-sm" id="btn-dia-siguiente">▶</button>
                                     <h4 class="mb-0 text-dark fw-bold ms-2" id="titulo-rango-fechas">Hoy</h4>
                                 </div>
-                                
                                 <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="vistaBtn" id="btn-vista-dia" checked>
                                     <label class="btn btn-outline-primary btn-sm" for="btn-vista-dia">Día</label>
-
                                     <input type="radio" class="btn-check" name="vistaBtn" id="btn-vista-semana">
                                     <label class="btn btn-outline-primary btn-sm" for="btn-vista-semana">Semana</label>
                                 </div>
                             </div>
 
                             <div class="bg-white rounded shadow-sm border p-3">
-                                <div id="calendario-grid">
-                                    </div>
+                                <div id="calendario-grid"></div>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="bg-white rounded shadow-sm border p-3 mb-3">
                                 <h6 class="fw-bold text-center mb-3" id="titulo-mini-calendario">Mes Año</h6>
-                                <div id="mini-calendario-grid">
-                                    </div>
+                                <div id="mini-calendario-grid"></div>
                             </div>
 
-                            <div class="bg-white rounded shadow-sm border p-3">
+                            <div class="bg-white rounded shadow-sm border p-3 mb-3">
                                 <h6 class="fw-bold mb-3">Estado de citas</h6>
                                 <div class="d-flex align-items-center mb-2">
-                                    <span class="legend-color color-agendada me-2"></span>
-                                    <span class="text-muted small">Cita agendada</span>
+                                    <span class="legend-color me-2" style="background:#ffc107; width:14px; height:14px; border-radius:3px; display:inline-block;"></span>
+                                    <span class="text-muted small">Pendiente de confirmar</span>
                                 </div>
-
                                 <div class="d-flex align-items-center mb-2">
-                                    <span class="legend-color color-noCita me-2"></span>
-                                    <span class="text-muted small">Sin agendar</span>
+                                    <span class="legend-color me-2" style="background:#198754; width:14px; height:14px; border-radius:3px; display:inline-block;"></span>
+                                    <span class="text-muted small">Confirmada</span>
                                 </div>
-
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="legend-color me-2" style="background:#dc3545; width:14px; height:14px; border-radius:3px; display:inline-block;"></span>
+                                    <span class="text-muted small">Cancelada</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="legend-color me-2" style="background:#6c757d; width:14px; height:14px; border-radius:3px; display:inline-block;"></span>
+                                    <span class="text-muted small">Completada</span>
+                                </div>
                                 <div class="d-flex align-items-center mb-2">
                                     <span class="legend-color color-inhabil me-2"></span>
-                                    <span class="text-muted small">Inhabil</span>
+                                    <span class="text-muted small">Inhábil</span>
                                 </div>
-                                
                             </div>
 
                             <div class="bg-white rounded shadow-sm border p-3">
                                 <h6 class="fw-bold mb-3">Siguientes Pacientes</h6>
                                 <p class="text-muted small">Aquí podemos listar un resumen rápido del día.</p>
                             </div>
-                            
                         </div>
                     </div>
                 </div>
 
+                <!-- EXPEDIENTES -->
                 <div id="vista-expedientes" class="vista-seccion">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2>Librería de Pacientes</h2>
@@ -149,20 +196,22 @@
                             <input type="text" class="form-control" placeholder="Buscar paciente..." id="busquedaPaciente">
                         </div>
                     </div>
-                    <div id="contenedor-expedientes" class="row row-cols-1 row-cols-md-3 g-4">
-                        </div>
+                    <div id="contenedor-expedientes" class="row row-cols-1 row-cols-md-3 g-4"></div>
                 </div>
 
             </main>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════════
+         MODAL: EXPEDIENTE CLÍNICO (sin cambios)
+    ══════════════════════════════════════════ -->
     <div class="modal fade" id="modalExpediente" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="tituloExpediente">Expediente Clínico</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs mb-3" id="pestañasExpediente" role="tablist">
@@ -179,7 +228,6 @@
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-citas-historial">Historial y Citas</button>
                         </li>
                     </ul>
-                    
                     <div class="tab-content p-3 border border-top-0 rounded-bottom">
                         <div class="tab-pane fade show active" id="tab-perfil">
                             <div class="row">
@@ -193,7 +241,7 @@
                         </div>
                         <div class="tab-pane fade text-center" id="tab-odontograma">
                             <p class="text-muted">Módulo de Odontograma Interactivo (En desarrollo)</p>
-                            <div class="bg-light p-5 rounded"> [Mapa Dental Visual Aquí] </div>
+                            <div class="bg-light p-5 rounded">[Mapa Dental Visual Aquí]</div>
                         </div>
                         <div class="tab-pane fade" id="tab-presupuesto">
                             <h5>Plan de Tratamiento Sugerido</h5>
@@ -212,28 +260,51 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="./src/pages/admin.js"></script>
-
-<div class="modal fade" id="modalHorarioBase" tabindex="-1" aria-labelledby="modalHorarioBaseLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalHorarioBaseLabel">⚙️ Configurar Horario Base</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-muted small">Define el horario estándar de tu semana. Los días marcados como "Inhábil" o las horas fuera del rango aparecerán bloqueadas.</p>
-                <div id="contenedor-horario-base">
-                    </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btn-guardar-horario">Guardar Horario</button>
+    <!-- ══════════════════════════════════════════
+         MODAL: CITA  (nueva cita / detalle)
+         appointment-modal.js inyecta el contenido
+    ══════════════════════════════════════════ -->
+    <div class="modal fade" id="modalCita" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modal-cita-titulo">Cita</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modal-cita-body">
+                    <!-- appointment-modal.js inyecta aquí -->
+                </div>
+                <div class="modal-footer" id="modal-cita-footer">
+                    <!-- appointment-modal.js inyecta botones aquí -->
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- ══════════════════════════════════════════
+         MODAL: HORARIO BASE (sin cambios)
+    ══════════════════════════════════════════ -->
+    <div class="modal fade" id="modalHorarioBase" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">⚙️ Configurar Horario Base</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Define el horario estándar de tu semana. Los días marcados como "Inhábil" o las horas fuera del rango aparecerán bloqueadas.</p>
+                    <div id="contenedor-horario-base"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar-horario">Guardar Horario</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./src/pages/admin.js"></script>
 
 </body>
 </html>

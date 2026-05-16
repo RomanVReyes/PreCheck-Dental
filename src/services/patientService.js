@@ -13,3 +13,8 @@ export async function buscarPacienteRecurrente(telefono, fechaNacimiento) {
     const querySnapshot = await getDocs(q);
     return querySnapshot.empty ? null : querySnapshot.docs[0].data();
 }
+
+export async function guardarPaciente(data) {
+
+    console.log("Guardando paciente:", data);
+}

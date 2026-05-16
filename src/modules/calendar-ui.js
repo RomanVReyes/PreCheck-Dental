@@ -1,4 +1,5 @@
 import { obtenerHorarioBase, guardarHorarioBaseDB } from '../services/clinicalService.js';
+import { listarCitasPorFecha, listarCitasPorRango } from '../services/appointmentService.js';
 
 let fechaNavegacion = new Date(); 
 let fechaMiniCalendario = new Date(); 
@@ -18,49 +19,79 @@ let horarioBase = {
     6: { inhabil: false, inicio: 10, fin: 14 } 
 };
 
+// ─────────────────────────────────────────────
+//  COLORES POR ESTADO DE CITA
+// ─────────────────────────────────────────────
+const COLORES_ESTADO = {
+    pendiente:   { fondo: '#fff3cd', borde: '#ffc107', texto: '#856404' },
+    confirmada:  { fondo: '#d1e7dd', borde: '#198754', texto: '#0f5132' },
+    cancelada:   { fondo: '#f8d7da', borde: '#dc3545', texto: '#842029' },
+    completada:  { fondo: '#e2e3e5', borde: '#6c757d', texto: '#41464b' },
+};
+
+// ─────────────────────────────────────────────
+//  HELPERS DE FECHA
+// ─────────────────────────────────────────────
+function fechaAString(fecha) {
+    // Date → "YYYY-MM-DD" en hora local (sin desfase UTC)
+    const y = fecha.getFullYear();
+    const m = String(fecha.getMonth() + 1).padStart(2, '0');
+    const d = String(fecha.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+function horaAMinutos(horaStr) {
+    const [h, m] = horaStr.split(':').map(Number);
+    return h * 60 + m;
+}
+
+// ─────────────────────────────────────────────
+//  INIT PRINCIPAL
+// ─────────────────────────────────────────────
 export async function renderizarCalendarioVacio() {
     configurarEventosControles();
     
     try {
         const datosDB = await obtenerHorarioBase();
-        if (datosDB) {
-            horarioBase = datosDB;
-        }
+        if (datosDB) horarioBase = datosDB;
     } catch (error) {
         console.error("Error cargando DB, usando horario por defecto.", error);
     }
 
-    actualizarVista();
+    await actualizarVista();
     renderizarMiniCalendario();
 }
 
+// ─────────────────────────────────────────────
+//  RECARGA PÚBLICA  →  admin.js puede llamarla
+//  tras confirmar/cancelar una cita
+// ─────────────────────────────────────────────
+export async function recargarCalendario() {
+    await actualizarVista();
+}
+
+// ─────────────────────────────────────────────
+//  CONTROLES DE NAVEGACIÓN (sin cambios)
+// ─────────────────────────────────────────────
 function configurarEventosControles() {
-    document.getElementById('btn-vista-dia').addEventListener('change', (e) => {
-        if(e.target.checked) { vistaActual = 'dia'; actualizarVista(); }
+    document.getElementById('btn-vista-dia').addEventListener('change', async (e) => {
+        if (e.target.checked) { vistaActual = 'dia'; await actualizarVista(); }
     });
-    document.getElementById('btn-vista-semana').addEventListener('change', (e) => {
-        if(e.target.checked) { vistaActual = 'semana'; actualizarVista(); }
+    document.getElementById('btn-vista-semana').addEventListener('change', async (e) => {
+        if (e.target.checked) { vistaActual = 'semana'; await actualizarVista(); }
     });
 
-    document.getElementById('btn-dia-anterior').addEventListener('click', () => {
-        if (vistaActual === 'dia') {
-            fechaNavegacion.setDate(fechaNavegacion.getDate() - 1);
-        } else {
-            fechaNavegacion.setDate(fechaNavegacion.getDate() - 7);
-        }
+    document.getElementById('btn-dia-anterior').addEventListener('click', async () => {
+        fechaNavegacion.setDate(fechaNavegacion.getDate() + (vistaActual === 'dia' ? -1 : -7));
         fechaMiniCalendario = new Date(fechaNavegacion); 
-        actualizarVista();
+        await actualizarVista();
         renderizarMiniCalendario();
     });
 
-    document.getElementById('btn-dia-siguiente').addEventListener('click', () => {
-        if (vistaActual === 'dia') {
-            fechaNavegacion.setDate(fechaNavegacion.getDate() + 1);
-        } else {
-            fechaNavegacion.setDate(fechaNavegacion.getDate() + 7);
-        }
+    document.getElementById('btn-dia-siguiente').addEventListener('click', async () => {
+        fechaNavegacion.setDate(fechaNavegacion.getDate() + (vistaActual === 'dia' ? 1 : 7));
         fechaMiniCalendario = new Date(fechaNavegacion); 
-        actualizarVista();
+        await actualizarVista();
         renderizarMiniCalendario();
     });
 
@@ -68,11 +99,13 @@ function configurarEventosControles() {
     document.getElementById('btn-guardar-horario').addEventListener('click', guardarHorarioBase);
 }
 
-function actualizarVista() {
+// ─────────────────────────────────────────────
+//  ACTUALIZAR VISTA  →  ahora async
+// ─────────────────────────────────────────────
+async function actualizarVista() {
     const grid = document.getElementById('calendario-grid');
     const titulo = document.getElementById('titulo-rango-fechas');
-
-    grid.innerHTML = ''; 
+    grid.innerHTML = '';
 
     const mesNombre = fechaNavegacion.toLocaleString('es-ES', { month: 'long' });
     const anio = fechaNavegacion.getFullYear();
@@ -86,84 +119,123 @@ function actualizarVista() {
         titulo.innerText = `${nombreDia} ${numDia} de ${mesNombre}, ${anio}`;
         titulo.classList.toggle('texto-hoy', esHoy);
 
-        grid.appendChild(generarVistaDia());
+        const fechaStr = fechaAString(fechaNavegacion);
+        let citas = [];
+        try {
+            citas = await listarCitasPorFecha(fechaStr);
+        } catch (e) {
+            console.error("Error cargando citas del día:", e);
+        }
+
+        grid.appendChild(generarVistaDia(citas));
 
     } else {
         const diaActual = fechaNavegacion.getDay();
         const distanciaLunes = diaActual === 0 ? -6 : 1 - diaActual;
-
         const lunes = new Date(fechaNavegacion);
         lunes.setDate(fechaNavegacion.getDate() + distanciaLunes);
-        lunes.setHours(0,0,0,0);
+        lunes.setHours(0, 0, 0, 0);
 
         const domingo = new Date(lunes);
         domingo.setDate(lunes.getDate() + 6);
-        domingo.setHours(23,59,59,999);
+        domingo.setHours(23, 59, 59, 999);
 
         const hoyNormalizado = new Date();
-        hoyNormalizado.setHours(12,0,0,0); 
-
+        hoyNormalizado.setHours(12, 0, 0, 0);
         const estaEnSemana = hoyNormalizado >= lunes && hoyNormalizado <= domingo;
 
         titulo.innerText = `Semana del ${lunes.getDate()} de ${mesNombre}`;
         titulo.classList.toggle('texto-hoy', estaEnSemana);
 
-        grid.appendChild(generarVistaSemana());
+        const fechaInicioStr = fechaAString(lunes);
+        const fechaFinStr    = fechaAString(domingo);
+        let citas = [];
+        try {
+            citas = await listarCitasPorRango(fechaInicioStr, fechaFinStr);
+        } catch (e) {
+            console.error("Error cargando citas de la semana:", e);
+        }
+
+        grid.appendChild(generarVistaSemana(citas, lunes));
     }
 }
 
-function generarVistaDia() {
+// ─────────────────────────────────────────────
+//  VISTA DÍA — con citas reales
+// ─────────────────────────────────────────────
+function generarVistaDia(citas = []) {
     const contenedor = document.createElement('div');
     contenedor.className = 'calendario-contenedor';
-    
+
     const diaIndex = fechaNavegacion.getDay();
-    const configDia = horarioBase[diaIndex] || { inhabil: false, inicio: HORA_INICIO, fin: HORA_FIN }; // Fallback
+    const configDia = horarioBase[diaIndex] || { inhabil: false, inicio: HORA_INICIO, fin: HORA_FIN };
+    const fechaStr = fechaAString(fechaNavegacion);
 
     for (let i = HORA_INICIO; i <= HORA_FIN; i++) {
         const horaStr = `${i.toString().padStart(2, '0')}:00`;
-        
         const esInhabil = configDia.inhabil || i < configDia.inicio || i >= configDia.fin;
-        const claseColor = esInhabil ? 'zona-inhabil' : '';
-        const funcionClic = esInhabil ? '' : `onclick="alert('Clic en ${horaStr}')"`;
 
-        contenedor.innerHTML += `
-            <div class="hora-fila">
-                <div class="hora-etiqueta">${horaStr}</div>
-                <div class="hora-zona-clic ${claseColor}" ${funcionClic}></div>
-            </div>`;
+        // Citas que empiezan en esta hora
+        const citasEnSlot = citas.filter(c => {
+            const horaInicioMin = horaAMinutos(c.horaInicio);
+            return horaInicioMin >= i * 60 && horaInicioMin < (i + 1) * 60;
+        });
+
+        const filaEl = document.createElement('div');
+        filaEl.className = 'hora-fila';
+        filaEl.innerHTML = `<div class="hora-etiqueta">${horaStr}</div>`;
+
+        const zonaEl = document.createElement('div');
+        zonaEl.className = `hora-zona-clic ${esInhabil ? 'zona-inhabil' : ''}`;
+
+        if (!esInhabil) {
+            zonaEl.style.cursor = 'pointer';
+            zonaEl.addEventListener('click', () => {
+                // Emite evento global para que admin.js abra el modal de nueva cita
+                window.dispatchEvent(new CustomEvent('calendario:nuevaCita', {
+                    detail: { fecha: fechaStr, horaInicio: horaStr }
+                }));
+            });
+        }
+
+        // Pintar citas dentro de la zona
+        citasEnSlot.forEach(cita => {
+            zonaEl.appendChild(crearTarjetaCita(cita));
+        });
+
+        filaEl.appendChild(zonaEl);
+        contenedor.appendChild(filaEl);
     }
+
     return contenedor;
 }
 
-function generarVistaSemana() {
+// ─────────────────────────────────────────────
+//  VISTA SEMANA — con citas reales
+// ─────────────────────────────────────────────
+function generarVistaSemana(citas = [], lunes) {
     const contenedor = document.createElement('div');
     const header = document.createElement('div');
     header.className = 'calendario-header-semana';
-    header.innerHTML = `<div style="width: 80px;"></div>`; 
-
-    const diaActual = fechaNavegacion.getDay();
-    const distanciaLunes = diaActual === 0 ? -6 : 1 - diaActual;
-    const lunes = new Date(fechaNavegacion);
-    lunes.setDate(fechaNavegacion.getDate() + distanciaLunes);
+    header.innerHTML = `<div style="width: 80px;"></div>`;
 
     const hoyReal = new Date();
     const diasSemana = [];
-    
-    for(let i = 0; i < 7; i++) {
+
+    for (let i = 0; i < 7; i++) {
         const dia = new Date(lunes);
         dia.setDate(lunes.getDate() + i);
         diasSemana.push(dia);
 
         const esHoy = dia.toDateString() === hoyReal.toDateString();
-        const claseTexto = esHoy ? 'dia-actual-texto' : '';
-
-        header.innerHTML += `<div class="dia-header"><span class="${claseTexto}">${nombresDias[dia.getDay()]} ${dia.getDate()}</span></div>`;
+        header.innerHTML += `<div class="dia-header"><span class="${esHoy ? 'dia-actual-texto' : ''}">${nombresDias[dia.getDay()]} ${dia.getDate()}</span></div>`;
     }
     contenedor.appendChild(header);
 
     const cuerpo = document.createElement('div');
     cuerpo.className = 'cuerpo-semana calendario-contenedor';
 
+    // Columna de horas
     let colHoras = `<div style="width: 80px;">`;
     for (let i = HORA_INICIO; i <= HORA_FIN; i++) {
         colHoras += `<div class="hora-fila"><div class="hora-etiqueta w-100 border-right-0">${i.toString().padStart(2, '0')}:00</div></div>`;
@@ -171,32 +243,102 @@ function generarVistaSemana() {
     colHoras += `</div>`;
     cuerpo.innerHTML += colHoras;
 
-    diasSemana.forEach((dia, index) => {
-        let colDia = `<div class="columna-dia">`;
-        const configDia = horarioBase[dia.getDay()] || { inhabil: false, inicio: HORA_INICIO, fin: HORA_FIN }; 
+    // Columnas por día
+    diasSemana.forEach(dia => {
+        const colDia = document.createElement('div');
+        colDia.className = 'columna-dia';
+
+        const configDia = horarioBase[dia.getDay()] || { inhabil: false, inicio: HORA_INICIO, fin: HORA_FIN };
+        const fechaStr = fechaAString(dia);
+
+        // Filtrar citas de este día
+        const citasDia = citas.filter(c => c.fecha === fechaStr);
 
         for (let i = HORA_INICIO; i <= HORA_FIN; i++) {
+            const horaStr = `${i.toString().padStart(2, '0')}:00`;
             const esInhabil = configDia.inhabil || i < configDia.inicio || i >= configDia.fin;
-            const claseColor = esInhabil ? 'zona-inhabil' : '';
-            const funcionClic = esInhabil ? '' : `onclick="alert('Clic Día ${index+1}, Hora ${i}:00')"`;
 
-            colDia += `<div class="hora-fila"><div class="hora-zona-clic w-100 ${claseColor}" ${funcionClic}></div></div>`;
+            const citasEnSlot = citasDia.filter(c => {
+                const min = horaAMinutos(c.horaInicio);
+                return min >= i * 60 && min < (i + 1) * 60;
+            });
+
+            const filaEl = document.createElement('div');
+            filaEl.className = 'hora-fila';
+
+            const zonaEl = document.createElement('div');
+            zonaEl.className = `hora-zona-clic w-100 ${esInhabil ? 'zona-inhabil' : ''}`;
+
+            if (!esInhabil) {
+                zonaEl.style.cursor = 'pointer';
+                zonaEl.addEventListener('click', () => {
+                    window.dispatchEvent(new CustomEvent('calendario:nuevaCita', {
+                        detail: { fecha: fechaStr, horaInicio: horaStr }
+                    }));
+                });
+            }
+
+            citasEnSlot.forEach(cita => {
+                zonaEl.appendChild(crearTarjetaCita(cita));
+            });
+
+            filaEl.appendChild(zonaEl);
+            colDia.appendChild(filaEl);
         }
-        colDia += `</div>`;
-        cuerpo.innerHTML += colDia;
+
+        cuerpo.appendChild(colDia);
     });
 
     contenedor.appendChild(cuerpo);
     return contenedor;
 }
 
+// ─────────────────────────────────────────────
+//  TARJETA DE CITA  →  se pinta dentro del slot
+// ─────────────────────────────────────────────
+function crearTarjetaCita(cita) {
+    const colores = COLORES_ESTADO[cita.estado] || COLORES_ESTADO.pendiente;
+
+    const el = document.createElement('div');
+    el.className = 'cita-tarjeta';
+    el.style.cssText = `
+        background: ${colores.fondo};
+        border-left: 3px solid ${colores.borde};
+        color: ${colores.texto};
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        margin-bottom: 2px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+    `;
+    el.title = `${cita.nombre} — ${cita.horaInicio} a ${cita.horaFin} (${cita.estado})`;
+    el.textContent = `${cita.horaInicio} ${cita.nombre}`;
+
+    // Click en tarjeta → abre modal de detalle
+    el.addEventListener('click', (e) => {
+        e.stopPropagation(); // No dispara el evento de nueva cita
+        window.dispatchEvent(new CustomEvent('calendario:verCita', {
+            detail: { cita }
+        }));
+    });
+
+    return el;
+}
+
+// ─────────────────────────────────────────────
+//  MODAL HORARIO BASE  (sin cambios internos)
+// ─────────────────────────────────────────────
 function abrirModalHorario() {
     const contenedor = document.getElementById('contenedor-horario-base');
     contenedor.innerHTML = '';
     
     const diasNombresCompletos = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     
-    for(let i=0; i<7; i++) {
+    for (let i = 0; i < 7; i++) {
         const config = horarioBase[i] || { inhabil: false, inicio: HORA_INICIO, fin: HORA_FIN };
         contenedor.innerHTML += `
             <div class="row mb-2 align-items-center bg-light p-2 rounded border-bottom">
@@ -237,23 +379,19 @@ async function guardarHorarioBase() {
         btn.disabled = true;
 
         const nuevoHorario = {};
-        for(let i=0; i<7; i++) {
+        for (let i = 0; i < 7; i++) {
             nuevoHorario[i.toString()] = {
                 inhabil: document.getElementById(`inhabil-${i}`).checked,
-                inicio: parseInt(document.getElementById(`inicio-${i}`).value),
-                fin: parseInt(document.getElementById(`fin-${i}`).value)
+                inicio:  parseInt(document.getElementById(`inicio-${i}`).value),
+                fin:     parseInt(document.getElementById(`fin-${i}`).value)
             };
         }
         
         await guardarHorarioBaseDB(nuevoHorario);
-        
         horarioBase = nuevoHorario;
         
-        const modalEl = document.getElementById('modalHorarioBase');
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        modalInstance.hide();
-        
-        actualizarVista();
+        bootstrap.Modal.getInstance(document.getElementById('modalHorarioBase')).hide();
+        await actualizarVista();
 
     } catch (error) {
         alert("Ocurrió un error al guardar el horario.");
@@ -263,6 +401,9 @@ async function guardarHorarioBase() {
     }
 }
 
+// ─────────────────────────────────────────────
+//  MINI CALENDARIO  (sin cambios)
+// ─────────────────────────────────────────────
 function renderizarMiniCalendario() {
     const contenedor = document.getElementById('mini-calendario-grid');
     const titulo = document.getElementById('titulo-mini-calendario');
@@ -271,7 +412,7 @@ function renderizarMiniCalendario() {
     const anioMini = fechaMiniCalendario.getFullYear();
     const hoyReal = new Date();
 
-    const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const mesesNombres = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     
     titulo.className = 'fw-bold mb-3 d-flex justify-content-between align-items-center';
     titulo.innerHTML = `
@@ -287,19 +428,15 @@ function renderizarMiniCalendario() {
     const primerDiaMes = new Date(anioMini, mesMini, 1).getDay();
     const totalDiasMes = new Date(anioMini, mesMini + 1, 0).getDate();
 
-    for(let i = 0; i < primerDiaMes; i++) { html += `<div></div>`; } 
+    for (let i = 0; i < primerDiaMes; i++) { html += `<div></div>`; }
 
-    for(let dia = 1; dia <= totalDiasMes; dia++) {
-        const esHoyReal = (dia === hoyReal.getDate() && mesMini === hoyReal.getMonth() && anioMini === hoyReal.getFullYear());
-        const esSeleccionado = (dia === fechaNavegacion.getDate() && mesMini === fechaNavegacion.getMonth() && anioMini === fechaNavegacion.getFullYear());
-        
+    for (let dia = 1; dia <= totalDiasMes; dia++) {
+        const esHoyReal    = dia === hoyReal.getDate() && mesMini === hoyReal.getMonth() && anioMini === hoyReal.getFullYear();
+        const esSeleccionado = dia === fechaNavegacion.getDate() && mesMini === fechaNavegacion.getMonth() && anioMini === fechaNavegacion.getFullYear();
+
         let claseDia = 'mini-dia text-dark';
-        
-        if (esHoyReal) {
-            claseDia += ' mini-dia-actual';
-        } else if (esSeleccionado) {
-            claseDia += ' mini-dia-hoy';
-        }
+        if (esHoyReal) claseDia += ' mini-dia-actual';
+        else if (esSeleccionado) claseDia += ' mini-dia-hoy';
 
         html += `<div class="${claseDia}" onclick="seleccionarFechaDesdeMini(${anioMini}, ${mesMini}, ${dia})">${dia}</div>`;
     }
@@ -313,9 +450,9 @@ window.cambiarMesMini = (delta) => {
     renderizarMiniCalendario();
 };
 
-window.seleccionarFechaDesdeMini = (anio, mes, dia) => {
+window.seleccionarFechaDesdeMini = async (anio, mes, dia) => {
     fechaNavegacion = new Date(anio, mes, dia);
-    fechaMiniCalendario = new Date(anio, mes, dia); 
-    actualizarVista();
+    fechaMiniCalendario = new Date(anio, mes, dia);
+    await actualizarVista();
     renderizarMiniCalendario();
 };

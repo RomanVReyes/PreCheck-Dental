@@ -3,91 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pre-Check Dental - Registro</title>
+    <title>Pre-Check Dental | Tu Clínica</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        .card { border-radius: 15px; }
-        .d-none { display: none !important; }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="./src/css/patient-flow.css">
 </head>
-<body class="bg-light">
-
+<body>
     <div class="container py-5">
-        <div class="mx-auto" style="max-width: 600px;">
-            
-            <div id="seccion-bienvenida" class="text-center card shadow p-5">
-                <h2 class="mb-4 text-primary">Pre-Check Dental</h2>
-                <p class="text-muted mb-4">Bienvenido, por favor selecciona una opción para continuar:</p>
-                <div class="d-grid gap-3">
-                    <button class="btn btn-primary btn-lg" onclick="mostrarSeccion('seccion-nuevo')">Soy Paciente Nuevo</button>
-                    <button class="btn btn-outline-secondary btn-lg" onclick="mostrarSeccion('seccion-recurrente')">Ya soy Cliente / Re-agendar</button>
+        <div class="mx-auto" style="max-width: 750px;">
+
+            <div id="seccion-bienvenida" class="seccion">
+                <div class="card shadow p-4 p-md-5 text-center">
+                    <div class="mb-4">
+                        <span class="logo-icon"><i class="bi bi-clipboard2-pulse"></i></span>
+                    </div>
+                    <h1 class="display-6 fw-bold mb-2">Bienvenido</h1>
+                    <p class="text-muted mb-5">
+                        Para continuar, indícanos si es tu primera visita<br>o si ya eres parte de nuestra familia dental.
+                    </p>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <button class="btn-opcion w-100" id="btn-nuevo">
+                                <span class="btn-opcion-icono text-primary"><i class="bi bi-person-plus"></i></span>
+                                <span class="btn-opcion-titulo">Soy paciente nuevo</span>
+                                <span class="btn-opcion-desc">Primera visita al consultorio</span>
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn-opcion w-100" id="btn-recurrente">
+                                <span class="btn-opcion-icono text-info"><i class="bi bi-person-check"></i></span>
+                                <span class="btn-opcion-titulo">Ya soy paciente</span>
+                                <span class="btn-opcion-desc">Re-agendar o solicitar cita</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div id="seccion-nuevo" class="d-none">
-                <button class="btn btn-sm btn-link mb-3" onclick="mostrarSeccion('seccion-bienvenida')">← Volver</button>
-                <div class="card shadow p-4">
-                    <h3 class="mb-4">Nuevo Historial Clínico</h3>
-                    <form id="formNuevo">
-                        <h6 class="text-primary border-bottom pb-2">Datos Personales</h6>
-                        <div class="mb-3">
-                            <label class="form-label">Nombre Completo</label>
-                            <input type="text" class="form-control" id="nombre" required>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Teléfono (WhatsApp)</label>
-                                <input type="tel" class="form-control" id="telefono" required placeholder="10 dígitos">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Fecha de Nacimiento</label>
-                                <input type="date" class="form-control" id="fechaNacimiento" required>
-                            </div>
-                        </div>
-
-                        <h6 class="text-danger border-bottom pb-2 mt-3">Alertas Médicas</h6>
-                        <div class="mb-3">
-                            <label class="form-label">¿Es alérgico a algo? (Penicilina, Anestesia, etc.)</label>
-                            <textarea class="form-control border-danger" id="alergias" rows="2" placeholder="Escriba 'Ninguna' si no tiene"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">¿Padece alguna enfermedad o toma medicamentos?</label>
-                            <input type="text" class="form-control" id="enfermedades">
-                        </div>
-
-                        <h6 class="text-primary border-bottom pb-2 mt-3">Motivo de Consulta</h6>
-                        <div class="mb-3">
-                            <label class="form-label">¿Por qué nos visita hoy?</label>
-                            <textarea class="form-control" id="motivo" rows="2" required></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-success w-100 py-3">Enviar mi Registro</button>
-                    </form>
+            <div id="seccion-registro" class="seccion d-none">
+                <div class="card shadow p-4 p-md-5">
+                    <button class="btn-volver mb-4" id="btn-volver-inicio">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al inicio
+                    </button>
+                    <div id="progress-container"></div>
+                    <div id="step-container" class="mt-4"></div>
                 </div>
             </div>
 
-            <div id="seccion-recurrente" class="d-none">
-                <button class="btn btn-sm btn-link mb-3" onclick="mostrarSeccion('seccion-bienvenida')">← Volver</button>
-                <div class="card shadow p-4 text-center">
-                    <h3 class="mb-4">Identificarse</h3>
-                    <p class="text-muted">Ingresa tus datos para agendar tu cita rápidamente.</p>
-                    <form id="formRecurrente">
-                        <div class="mb-3 text-start">
-                            <label class="form-label">Teléfono Registrado</label>
-                            <input type="tel" class="form-control" id="telBusqueda" required>
+            <div id="seccion-recurrente" class="seccion d-none">
+                <div class="card shadow p-4 p-md-5">
+                    <button class="btn-volver mb-4" id="btn-volver-recurrente">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al inicio
+                    </button>
+                    <div class="text-center mb-4">
+                        <span class="logo-icon"><i class="bi bi-person-badge"></i></span>
+                        <h2 class="fw-bold mt-3 mb-1">Identifícate</h2>
+                        <p class="text-muted small">Ingresa tus datos para acceder a tu cuenta</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Teléfono registrado</label>
+                        <input type="tel" id="rec-telefono" class="form-control form-control-lg"
+                            placeholder="10 dígitos">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Fecha de nacimiento</label>
+                        <input type="date" id="rec-fecha" class="form-control form-control-lg">
+                    </div>
+
+                    <div id="rec-error" class="alert alert-danger d-none py-2">
+                        <i class="bi bi-exclamation-triangle me-2"></i> No encontramos un expediente con esos datos.
+                        <a href="#" id="rec-link-nuevo" class="alert-link ms-1">¿Eres paciente nuevo?</a>
+                    </div>
+
+                    <div id="rec-exito" class="d-none text-center py-3">
+                        <div class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
                         </div>
-                        <div class="mb-4 text-start">
-                            <label class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" class="form-control" id="fechaBusqueda" required>
+                        <h4 class="fw-bold" id="rec-nombre-bienvenida">¡Hola!</h4>
+                        <p class="text-muted mb-4">Te reconocimos en nuestro sistema.</p>
+                        <button class="btn btn-primary btn-lg w-100" id="btn-solicitar-cita">
+                            <i class="bi bi-calendar-plus me-2"></i> Solicitar una cita
+                        </button>
+                    </div>
+
+                    <div id="rec-form">
+                        <button class="btn btn-primary w-100 btn-lg" id="btn-buscar-recurrente">
+                            Buscar mi expediente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="seccion-solicitar-cita" class="seccion d-none">
+                <div class="card shadow p-4 p-md-5">
+                    <button class="btn-volver mb-4" id="btn-volver-cita">
+                        <i class="bi bi-arrow-left me-1"></i> Volver
+                    </button>
+                    <div class="text-center mb-4">
+                        <span class="logo-icon"><i class="bi bi-calendar2-heart"></i></span>
+                        <h2 class="fw-bold mt-3 mb-1">Solicitar Cita</h2>
+                        <p class="text-muted small">
+                            Propón tu fecha y hora preferida. El consultorio<br>te confirmará a la brevedad.
+                        </p>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Fecha deseada</label>
+                            <input type="date" id="cita-fecha" class="form-control form-control-lg" min="">
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2">Verificar y Continuar</button>
-                    </form>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Hora preferida</label>
+                            <select id="cita-hora" class="form-select form-select-lg">
+                                <option value="">— Selecciona —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Duración estimada</label>
+                        <select id="cita-duracion" class="form-select">
+                            <option value="30">30 minutos</option>
+                            <option value="60" selected>1 hora</option>
+                            <option value="90">1 hora 30 min</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tipo de consulta</label>
+                        <select id="cita-tipo" class="form-select">
+                            <option value="Revisión general">Revisión general</option>
+                            <option value="Limpieza dental">Limpieza dental</option>
+                            <option value="Extracción">Extracción</option>
+                            <option value="Ortodoncia">Ortodoncia</option>
+                            <option value="Endodoncia">Endodoncia</option>
+                            <option value="Blanqueamiento">Blanqueamiento</option>
+                            <option value="Radiografía">Radiografía</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Motivo o descripción</label>
+                        <textarea id="cita-motivo" class="form-control" rows="3"
+                            placeholder="Describe brevemente tu situación o lo que necesitas..."></textarea>
+                    </div>
+
+                    <div id="cita-error" class="alert alert-danger d-none py-2"></div>
+                    
+                    <div id="cita-exito" class="d-none text-center py-4">
+                        <div class="mb-3">
+                            <i class="bi bi-calendar-check-fill text-success" style="font-size: 3.5rem;"></i>
+                        </div>
+                        <h4 class="fw-bold">¡Solicitud enviada!</h4>
+                        <p class="text-muted">
+                            Revisaremos tu solicitud y te contactaremos<br>
+                            al número registrado para confirmar tu cita.
+                        </p>
+                    </div>
+
+                    <div id="cita-form-footer">
+                        <button class="btn btn-primary btn-lg w-100" id="btn-enviar-cita">
+                            Enviar solicitud
+                        </button>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
-    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/pages/patient-flow.js"></script>
+
+    <!-- <script type="module" src="./src/seeds/seed-padecimientos.js"></script> -->
 </body>
 </html>

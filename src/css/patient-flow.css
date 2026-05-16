@@ -1,0 +1,159 @@
+/* ══════════════════════════════════════════
+   VARIABLES DE TEMA (Dental / Clínico)
+   ══════════════════════════════════════════ */
+:root {
+    --primary-color: #0d6efd; /* Azul médico */
+    --primary-hover: #0b5ed7;
+    --secondary-color: #0dcaf0; /* Cyan limpio */
+    --bg-color: #f4f7f9; /* Fondo gris muy suave */
+    --card-bg: #ffffff;
+    --text-main: #2b3445;
+    --text-muted: #7d879c;
+    --border-radius: 16px;
+    --transition: all 0.3s ease;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ══════════════════════════════════════════
+   TARJETAS Y CONTENEDORES
+   ══════════════════════════════════════════ */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+.logo-icon {
+    font-size: 3.5rem;
+    display: inline-block;
+    background: rgba(13, 110, 253, 0.1);
+    width: 90px;
+    height: 90px;
+    line-height: 90px;
+    border-radius: 50%;
+    color: var(--primary-color);
+}
+
+/* ══════════════════════════════════════════
+   BOTONES DE SELECCIÓN (Bienvenida)
+   ══════════════════════════════════════════ */
+.btn-opcion {
+    background: #fff;
+    border: 2px solid #e3e9ef;
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.btn-opcion:hover {
+    border-color: var(--primary-color);
+    background: rgba(13, 110, 253, 0.02);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.1);
+}
+
+.btn-opcion-icono {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-opcion-titulo {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+}
+
+.btn-opcion-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ══════════════════════════════════════════
+   CONTROLES DE FORMULARIO
+   ══════════════════════════════════════════ */
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    border-color: var(--primary-color);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+/* ══════════════════════════════════════════
+   BARRA DE PROGRESO Y NAVEGACIÓN
+   ══════════════════════════════════════════ */
+.progress {
+    height: 10px;
+    border-radius: 20px;
+    background-color: #e9ecef;
+    margin-bottom: 2rem;
+}
+
+.progress-bar {
+    border-radius: 20px;
+    background-color: var(--primary-color);
+}
+
+.btn-volver {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 0;
+    transition: var(--transition);
+}
+
+.btn-volver:hover {
+    color: var(--primary-color);
+    transform: translateX(-3px);
+}
+
+/* ══════════════════════════════════════════
+   CHECKBOXES CONDICIONALES (Estilo Moderno)
+   ══════════════════════════════════════════ */
+.custom-checkbox-card {
+    border: 1px solid #e3e9ef;
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+}
+
+.custom-checkbox-card:hover {
+    background-color: #f8f9fa;
+    border-color: #b6d4fe;
+}
+
+.custom-checkbox-card input[type="checkbox"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-right: 10px;
+    cursor: pointer;
+}
