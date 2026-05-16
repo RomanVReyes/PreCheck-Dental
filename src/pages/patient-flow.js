@@ -146,7 +146,11 @@ function previousStep() {
 function guardarDatosPasoActual() {
     switch (currentStep) {
         case 1: patientData.datosPersonales           = obtenerDatosPersonales();  break;
-        case 2: patientData.antecedentes              = obtenerDatosMedicos();      break;
+        case 2: {
+            const medicos = obtenerDatosMedicos();
+            patientData.antecedentes.enfermedades = medicos.enfermedades;
+            break;
+        }
         case 3: patientData.antecedentes.cirugias     = obtenerDatosCirugias();     break; 
         case 4: patientData.antecedentes.medicamentos = obtenerDatosMedicamentos(); break; 
         case 5: patientData.antecedentes.alergias     = obtenerDatosAlergias();     break; 
@@ -334,7 +338,6 @@ async function finalizarFormulario() {
 
             // Consulta
             motivo:          patientData.motivoConsulta?.motivo       ?? '',
-            tipoConsulta:    patientData.motivoConsulta?.tipo         ?? '', // (si la tenías antes)
             consentimientos: patientData.consentimientos,
             fechaRegistro:   new Date().toISOString(),
             estatus:         'prospecto',
