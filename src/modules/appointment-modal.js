@@ -124,7 +124,7 @@ async function abrirModalNuevaCita(fecha = '', horaInicio = '') {
     document.getElementById('modal-cita-footer').innerHTML = `
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="btn-guardar-nueva-cita">
-            💾 Guardar Cita
+            <i class="bi bi-save me-2"></i>Guardar Cita
         </button>
     `;
 
@@ -179,7 +179,7 @@ async function guardarNuevaCita() {
         mostrarErrorModal('Ocurrió un error al guardar. Intenta de nuevo.');
     } finally {
         btn.disabled = false;
-        btn.textContent = '💾 Guardar Cita';
+        btn.innerHTML = '<i class="bi bi-save me-2"></i>Guardar Cita';
     }
 }
 
@@ -200,7 +200,7 @@ function abrirModalDetalleCita(cita) {
         <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
                 <h5 class="fw-bold mb-1">${cita.nombre}</h5>
-                <span class="text-muted small">📱 ${cita.telefono}</span>
+                <span class="text-muted small"><i class="bi bi-phone me-1"></i>${cita.telefono}</span>
             </div>
             <span class="badge bg-${badgeColor} fs-6 text-capitalize">${cita.estado}</span>
         </div>
@@ -246,20 +246,20 @@ function abrirModalDetalleCita(cita) {
 
     if (cita.estado === 'pendiente') {
         footer.innerHTML += `
-            <button class="btn btn-success" id="btn-det-confirmar">✅ Confirmar</button>
-            <button class="btn btn-danger"  id="btn-det-cancelar">❌ Cancelar</button>
+            <button class="btn btn-success" id="btn-det-confirmar"><i class="bi bi-check2 me-2"></i>Confirmar</button>
+            <button class="btn btn-danger"  id="btn-det-cancelar"><i class="bi bi-x-lg me-2"></i>Cancelar</button>
         `;
     }
     if (cita.estado === 'confirmada') {
         footer.innerHTML += `
-            <button class="btn btn-outline-success" id="btn-det-completar">🏁 Marcar completada</button>
-            <button class="btn btn-danger"           id="btn-det-cancelar">❌ Cancelar cita</button>
+            <button class="btn btn-outline-success" id="btn-det-completar"><i class="bi bi-flag me-2"></i>Marcar completada</button>
+            <button class="btn btn-danger"           id="btn-det-cancelar"><i class="bi bi-x-lg me-2"></i>Cancelar cita</button>
         `;
     }
 
     // Siempre: guardar notas
     footer.innerHTML += `
-        <button class="btn btn-primary" id="btn-det-guardar-notas">💾 Guardar notas</button>
+        <button class="btn btn-primary" id="btn-det-guardar-notas"><i class="bi bi-save me-2"></i>Guardar notas</button>
     `;
 
     // Eventos de los botones de acción
@@ -305,16 +305,16 @@ async function guardarNotasCita(idCita) {
         btn.disabled = true;
         btn.textContent = 'Guardando...';
         await actualizarCita(idCita, { notas });
-        btn.textContent = '✅ Guardado';
+        btn.innerHTML = '<i class="bi bi-check2 me-2"></i>Guardado';
         setTimeout(() => {
-            btn.textContent = '💾 Guardar notas';
+            btn.innerHTML = '<i class="bi bi-save me-2"></i>Guardar notas';
             btn.disabled = false;
         }, 1500);
     } catch (e) {
         console.error('Error guardando notas:', e);
         mostrarErrorModal('No se pudieron guardar las notas.');
         btn.disabled = false;
-        btn.textContent = '💾 Guardar notas';
+        btn.innerHTML = '<i class="bi bi-save me-2"></i>Guardar notas';
     }
 }
 

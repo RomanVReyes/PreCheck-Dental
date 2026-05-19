@@ -1,184 +1,1280 @@
-/* Estilos para el calendario de citas */
+:root {
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --cyan-soft: #e7f8fc;
+    --surface: #ffffff;
+    --surface-soft: #f7f9fc;
+    --page-bg: #eef3f7;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border-color: #dbe4ee;
+    --shadow-soft: 0 14px 35px rgba(31, 41, 55, 0.08);
+    --sidebar-width: 278px;
+    --radius: 14px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--page-bg);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.dashboard-shell {
+    min-height: 100vh;
+}
+
+.app-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 20;
+    width: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    background: #ffffff;
+    border-right: 1px solid var(--border-color);
+    box-shadow: 10px 0 30px rgba(31, 41, 55, 0.05);
+}
+
+.brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.4rem 0.25rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    color: var(--primary-color);
+    background: rgba(13, 110, 253, 0.1);
+    font-size: 1.45rem;
+}
+
+.brand-kicker,
+.section-kicker {
+    margin: 0 0 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.brand-title {
+    color: var(--text-main);
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.sidebar-nav {
+    gap: 0.35rem;
+}
+
+.app-sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-height: 46px;
+    padding: 0.75rem 0.85rem;
+    border-radius: 12px;
+    color: #536173;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.app-sidebar .nav-link i {
+    width: 1.2rem;
+    font-size: 1.1rem;
+}
+
+.app-sidebar .nav-link:hover {
+    color: var(--primary-color);
+    background: rgba(13, 110, 253, 0.07);
+}
+
+.app-sidebar .active-link {
+    color: #ffffff !important;
+    background: var(--primary-color) !important;
+    box-shadow: 0 10px 22px rgba(13, 110, 253, 0.24);
+}
+
+.sidebar-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding: 0.9rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--surface-soft);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.clinic-status-dot {
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #20c997;
+    box-shadow: 0 0 0 5px rgba(32, 201, 151, 0.12);
+}
+
+.dashboard-main {
+    min-height: 100vh;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+}
+
+.vista-seccion {
+    display: none;
+    animation: fadeIn 0.24s ease-in-out;
+}
+
+.vista-activa {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.page-heading h2 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: clamp(1.65rem, 3vw, 2.2rem);
+    font-weight: 800;
+}
+
+.header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    justify-content: flex-end;
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 10px 20px rgba(13, 110, 253, 0.16);
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: #526071;
+    background: #ffffff;
+}
+
+.btn-outline-secondary:hover {
+    border-color: #bfccd9;
+    color: var(--text-main);
+    background: #f7f9fc;
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    color: #526071;
+}
+
+.btn-icon:hover {
+    color: var(--primary-color);
+    border-color: #b6d4fe;
+    background: rgba(13, 110, 253, 0.06);
+}
+
+.metric-card,
+.panel-section {
+    border: 1px solid rgba(219, 228, 238, 0.9);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+}
+
+.metric-card {
+    position: relative;
+    min-height: 162px;
+    padding: 1.1rem;
+    overflow: hidden;
+}
+
+.metric-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 4px;
+    background: var(--card-accent, var(--primary-color));
+}
+
+.metric-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 1rem;
+    border-radius: 11px;
+    color: var(--card-accent, var(--primary-color));
+    background: color-mix(in srgb, var(--card-accent, var(--primary-color)) 13%, white);
+    font-size: 1.25rem;
+}
+
+.metric-card p {
+    margin: 0 0 0.35rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.metric-card strong {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--text-main);
+    font-size: 1.45rem;
+    line-height: 1.15;
+}
+
+.metric-card span {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.accent-primary { --card-accent: #0d6efd; }
+.accent-warning { --card-accent: #f59f00; }
+.accent-success { --card-accent: #20c997; }
+
+.panel-section {
+    padding: 1.15rem;
+}
+
+.soft-panel {
+    background: linear-gradient(180deg, #ffffff 0%, #f5fbff 100%);
+}
+
+.panel-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.panel-title-row h3,
+.compact-panel h3 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    color: #0f6848;
+    background: rgba(32, 201, 151, 0.12);
+    font-size: 0.78rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.workflow-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.workflow-item {
+    display: flex;
+    gap: 0.8rem;
+    padding: 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.workflow-item > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    color: var(--primary-color);
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.workflow-item strong {
+    display: block;
+    margin-bottom: 0.15rem;
+    color: var(--text-main);
+}
+
+.workflow-item p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+}
+
+.quick-action {
+    min-height: 104px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--text-main);
+    font-weight: 800;
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.quick-action i {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--primary-color);
+    font-size: 1.45rem;
+}
+
+.quick-action:hover {
+    border-color: #b6d4fe;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(13, 110, 253, 0.11);
+}
+
+.dashboard-tabs {
+    gap: 0.5rem;
+}
+
+.dashboard-tabs .nav-link {
+    border-radius: 999px;
+    color: #526071;
+    font-weight: 800;
+}
+
+.dashboard-tabs .nav-link.active {
+    background: var(--primary-color);
+}
+
+.dashboard-table-wrap {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.table {
+    color: var(--text-main);
+}
+
+.table thead th {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    background: #f8fafc;
+    color: #526071;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.table tbody td {
+    padding: 0.95rem 1rem;
+    border-color: #edf2f7;
+}
+
+.table .btn-sm {
+    border-radius: 9px;
+    font-weight: 800;
+}
+
+.calendar-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow-soft);
+}
+
+.date-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+}
+
+.date-controls h3 {
+    margin: 0 0 0 0.25rem;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.view-toggle .btn {
+    min-width: 76px;
+    border-radius: 9px;
+}
+
+.calendar-panel {
+    padding: 0.75rem;
+}
+
+.side-stack {
+    display: grid;
+    gap: 1rem;
+}
+
+.compact-panel h3 {
+    margin-bottom: 0.85rem;
+}
+
+.legend-list {
+    display: grid;
+    gap: 0.65rem;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.legend-list div {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.legend-color {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.status-pending { background: #ffc107; }
+.status-confirmed { background: #198754; }
+.status-cancelled { background: #dc3545; }
+.status-completed { background: #6c757d; }
+.color-agendada { background: #28a745; }
+.color-descanso { background: #ffc107; }
+.color-fuera { background: #dc3545; }
+.color-inhabil { background: #8a94a3; }
+.color-noCita { background: #ffffff; border: 1px solid #ced4da; }
+
+.empty-state-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 64px;
+    padding: 0.85rem;
+    border-radius: 12px;
+    background: var(--surface-soft);
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.empty-state-inline i {
+    color: var(--primary-color);
+    font-size: 1.15rem;
+}
+
+.dashboard-search {
+    max-width: 340px;
+}
+
+.dashboard-search .input-group-text,
+.dashboard-search .form-control,
+.form-control,
+.form-select {
+    border-color: var(--border-color);
+}
+
+.dashboard-search .input-group-text {
+    border-radius: 10px 0 0 10px;
+    background: #ffffff;
+    color: var(--text-muted);
+}
+
+.dashboard-search .form-control {
+    border-radius: 0 10px 10px 0;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.14);
+}
+
+.card {
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft) !important;
+}
+
+.hover-card {
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-3px);
+    border-color: #b6d4fe !important;
+    box-shadow: 0 18px 34px rgba(13, 110, 253, 0.12) !important;
+}
+
+.patient-card {
+    overflow: hidden;
+}
+
+.patient-card .card-body {
+    padding: 1rem;
+}
+
+.patient-card .card-footer {
+    padding: 0 1rem 1rem;
+    border: 0;
+    background: transparent;
+}
+
+.patient-card-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.patient-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: rgba(13, 110, 253, 0.1);
+    color: var(--primary-color);
+    font-weight: 800;
+}
+
+.avatar-lg {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    font-size: 1.2rem;
+}
+
+.patient-card .card-title {
+    margin: 0 0 0.15rem;
+    color: var(--text-main);
+    font-size: 1rem;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.patient-meta {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.patient-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 0.9rem;
+}
+
+.patient-card-grid div {
+    padding: 0.7rem;
+    border: 1px solid var(--border-color);
+    border-radius: 11px;
+    background: var(--surface-soft);
+}
+
+.patient-card-grid span,
+.patient-label {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.patient-card-grid strong {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--text-main);
+    font-size: 0.92rem;
+}
+
+.patient-card-section {
+    margin-bottom: 0.85rem;
+}
+
+.patient-card-section p {
+    display: -webkit-box;
+    min-height: 2.7rem;
+    margin: 0.3rem 0 0;
+    overflow: hidden;
+    color: #465466;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.patient-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.patient-tags span {
+    max-width: 100%;
+    padding: 0.35rem 0.55rem;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #526071;
+    font-size: 0.76rem;
+    font-weight: 800;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.expediente-tabs-content {
+    min-height: 470px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.expediente-hero {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+}
+
+.expediente-hero h3 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.expediente-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.55rem;
+}
+
+.expediente-badges span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #526071;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.expediente-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.clinical-info-card,
+.clinical-block,
+.budget-summary {
+    border: 1px solid var(--border-color);
+    border-radius: 13px;
+    background: #ffffff;
+}
+
+.clinical-info-card {
+    padding: 0.8rem;
+}
+
+.clinical-info-card span {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.clinical-info-card strong {
+    color: var(--text-main);
+    font-size: 0.92rem;
+}
+
+.clinical-block {
+    height: 100%;
+    padding: 1rem;
+}
+
+.clinical-block h6 {
+    margin-bottom: 0.75rem;
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+.clinical-alert {
+    border-color: rgba(245, 159, 0, 0.35);
+    background: #fffaf0;
+}
+
+.clinical-list {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+    padding-left: 1rem;
+    color: #465466;
+}
+
+.odontogram-layout,
+.budget-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 1rem;
+}
+
+.odontogram-board {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: var(--surface-soft);
+}
+
+.odontogram-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.odontogram-title h5 {
+    margin: 0;
+    font-weight: 800;
+}
+
+.teeth-grid {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(42px, 1fr));
+    gap: 0.55rem;
+}
+
+.tooth-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 58px;
+    border: 1px solid #d8e3ee;
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--text-main);
+    font-weight: 800;
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tooth-cell i {
+    color: #9fb0c2;
+    font-size: 1.05rem;
+}
+
+.tooth-cell:hover {
+    border-color: #b6d4fe;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(13, 110, 253, 0.12);
+}
+
+.odontogram-side {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+}
+
+.odontogram-legend {
+    display: grid;
+    gap: 0.55rem;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 0.45rem;
+    border-radius: 50%;
+}
+
+.legend-dot.healthy { background: #20c997; }
+.legend-dot.watch { background: #f59f00; }
+.legend-dot.treatment { background: #dc3545; }
+
+.budget-layout {
+    align-items: start;
+}
+
+.budget-summary {
+    padding: 1rem;
+    background: #f7fbff;
+}
+
+.budget-summary span {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.budget-summary strong {
+    display: block;
+    margin: 0.35rem 0;
+    color: var(--text-main);
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.budget-summary p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.history-list {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.history-item,
+.history-empty {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 13px;
+    background: #ffffff;
+}
+
+.history-item {
+    grid-template-columns: 170px minmax(0, 1fr);
+}
+
+.history-date {
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+}
+
+.history-date strong {
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+.history-date span,
+.history-body p,
+.history-body small,
+.history-empty p {
+    color: var(--text-muted);
+}
+
+.history-body p {
+    margin: 0.35rem 0;
+}
+
+.history-empty {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+}
+
+.history-empty i {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.modal-content {
+    border: 0;
+    border-radius: var(--radius);
+    box-shadow: 0 26px 70px rgba(15, 23, 42, 0.22);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+/* Calendario de citas */
 .casilla-hora {
     transition: background-color 0.2s;
     cursor: pointer;
 }
+
 .casilla-hora:hover {
-    background-color: #f1f3f5 !important; /* Un gris muy tenue */
+    background-color: #f1f5f9 !important;
 }
 
-/* Contenedor relativo: el lienzo donde pintaremos el fondo y las citas flotantes */
 .calendario-contenedor {
     position: relative;
-    background: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-    overflow-y: auto; /* Por si quieres ponerle altura máxima después */
+    max-height: 66vh;
+    overflow: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: #ffffff;
 }
 
-/* El fondo: cada hora medirá exactamente 60px (1px por minuto) */
 .hora-fila {
-    height: 60px; 
-    border-bottom: 1px solid #eee;
     display: flex;
     align-items: stretch;
+    min-height: 60px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.hora-fila:last-child {
+    border-bottom: 0;
 }
 
 .hora-etiqueta {
     width: 80px;
-    border-right: 1px solid #dee2e6;
+    flex: 0 0 80px;
+    padding-top: 0.55rem;
+    border-right: 1px solid var(--border-color);
+    background: #f8fafc;
+    color: var(--text-muted);
     text-align: center;
-    padding-top: 5px;
-    color: #6c757d;
-    font-weight: bold;
-    background: #f8f9fa;
+    font-size: 0.76rem;
+    font-weight: 800;
 }
 
 .hora-zona-clic {
     flex-grow: 1;
+    padding: 0.28rem;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.18s ease;
 }
 
 .hora-zona-clic:hover {
-    background-color: rgba(13, 110, 253, 0.05); /* Azul muy tenue al pasar el mouse */
+    background-color: rgba(13, 110, 253, 0.05);
 }
 
-/* Tarjetas Flotantes de Citas */
 .cita-bloque {
     position: absolute;
-    left: 85px; /* Deja el espacio de la columna de las horas libre */
-    right: 10px; /* Margen a la derecha */
-    border-radius: 4px;
-    padding: 2px 8px;
-    font-size: 0.85rem;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    cursor: pointer;
-    transition: transform 0.1s, z-index 0.1s;
+    left: 85px;
+    right: 10px;
     z-index: 10;
+    padding: 0.2rem 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+    cursor: pointer;
+    overflow: hidden;
+    font-size: 0.85rem;
+    transition: transform 0.12s ease, z-index 0.12s ease;
 }
 
 .cita-bloque:hover {
+    z-index: 20 !important;
     transform: scale(1.02);
-    z-index: 20 !important; /* Si hay dos empalmadas, la que tocas se viene al frente */
 }
 
 .cita-confirmada {
-    background-color: #d1e7dd; /* Verde tenue */
     border-left: 4px solid #198754;
+    background-color: rgba(209, 231, 221, 0.92);
     color: #0f5132;
-    /* Le damos ligera opacidad por si hay dos empalmadas, puedas ver la de abajo */
-    background-color: rgba(209, 231, 221, 0.9); 
 }
 
-/* --- VISTA SEMANAL --- */
+.cita-tarjeta {
+    min-height: 26px;
+    box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
+}
+
 .calendario-header-semana {
     display: flex;
-    border-bottom: 1px solid #dee2e6;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
+    align-items: center;
+    padding: 0 0 0.65rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.65rem;
 }
+
 .dia-header {
     flex: 1;
+    color: #526071;
     text-align: center;
-    font-weight: bold;
-    color: #495057;
+    font-size: 0.8rem;
+    font-weight: 800;
 }
-.dia-actual-texto {
-    color: #0d6efd !important; /* Azul de Bootstrap */
-    font-size: 1.1rem;
+
+.dia-actual-texto,
+.texto-hoy {
+    color: var(--primary-color) !important;
 }
 
 .cuerpo-semana {
     display: flex;
     position: relative;
 }
+
 .columna-dia {
     flex: 1;
+    min-width: 108px;
     position: relative;
-    border-right: 1px solid #dee2e6;
-}
-.columna-dia:last-child {
-    border-right: none;
+    border-right: 1px solid var(--border-color);
 }
 
-/* --- MINI CALENDARIO --- */
+.columna-dia:last-child {
+    border-right: 0;
+}
+
+/* Mini calendario */
 .mini-dia-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
     text-align: center;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #6c757d;
-    margin-bottom: 5px;
-}
-.mini-dias-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px; /* Un poco más de espacio entre días */
+    font-size: 0.72rem;
+    font-weight: 800;
 }
 
-/* Círculo perfecto */
+.mini-dias-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.25rem;
+}
+
 .mini-dia {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px; /* Ancho fijo */
-    aspect-ratio: 1 / 1; /* Esto fuerza que la altura sea igual al ancho */
-    margin: 0 auto; /* Centrar en su columna */
-    font-size: 0.85rem;
-    cursor: pointer;
+    width: 32px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border: 2px solid transparent;
     border-radius: 50%;
-    transition: 0.2s;
-    border: 2px solid transparent; /* Borde invisible por defecto para que no brinque al seleccionar */
+    color: var(--text-main);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
+
 .mini-dia:hover {
-    background-color: #f8f9fa;
+    background-color: rgba(13, 110, 253, 0.08);
 }
 
-/* Ahora esto es para el "Hoy" real (Fondo azul sólido) */
 .mini-dia-actual {
-    background-color: #0d6efd;
-    color: white !important;
-    font-weight: bold;
+    background-color: var(--primary-color);
+    color: #ffffff !important;
+    font-weight: 800;
 }
-.mini-dia-actual:hover { background-color: #0b5ed7; }
 
-/* Ahora esto es para el "Día Seleccionado" (Transparente con borde azul) */
+.mini-dia-actual:hover {
+    background-color: var(--primary-hover);
+}
+
 .mini-dia-hoy {
-    border-color: #0d6efd;
-    color: #0d6efd;
-    font-weight: bold;
-    background-color: transparent;
+    border-color: var(--primary-color);
+    color: var(--primary-color) !important;
+    background-color: #ffffff;
+    font-weight: 800;
 }
 
-.texto-hoy {
-    color: #0d6efd !important;
-}
-
-/*Leyendas*/
-
-.legend-color {
-    width: 15px;
-    height: 15px;
-    border-radius: 3px;
-    display: inline-block;
-}
-
-.color-agendada { background: #28a745; }
-.color-descanso { background: #ffc107; }
-.color-fuera { background: #dc3545; }
-.color-inhabil { background: #6c757d; }
-.color-noCita { background: #ffffff; border: 1px solid #ced4da;}
-
-/* Añadir al final de dashboard.css */
 .zona-inhabil {
-    background-color: #6c757d !important;
+    background:
+        repeating-linear-gradient(
+            135deg,
+            rgba(148, 163, 184, 0.22) 0,
+            rgba(148, 163, 184, 0.22) 7px,
+            rgba(148, 163, 184, 0.12) 7px,
+            rgba(148, 163, 184, 0.12) 14px
+        ) !important;
     cursor: not-allowed !important;
-    opacity: 0.6; /* Para que no sea un gris tan pesado visualmente */
+    opacity: 0.78;
 }
 
 .zona-inhabil:hover {
-    background-color: #6c757d !important; /* Sobrescribir el hover azul */
+    background:
+        repeating-linear-gradient(
+            135deg,
+            rgba(148, 163, 184, 0.22) 0,
+            rgba(148, 163, 184, 0.22) 7px,
+            rgba(148, 163, 184, 0.12) 7px,
+            rgba(148, 163, 184, 0.12) 14px
+        ) !important;
+}
+
+@media (max-width: 991.98px) {
+    .app-sidebar {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        min-height: auto;
+        padding: 0.85rem;
+        border-right: 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-lockup {
+        padding-bottom: 0.75rem;
+    }
+
+    .sidebar-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .dashboard-main {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .page-heading,
+    .calendar-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .header-actions,
+    .dashboard-search {
+        width: 100%;
+        max-width: none;
+    }
+
+    .header-actions .btn {
+        flex: 1 1 180px;
+    }
+
+    .expediente-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .odontogram-layout,
+    .budget-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .sidebar-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .date-controls {
+        flex-wrap: wrap;
+    }
+
+    .view-toggle {
+        width: 100%;
+    }
+
+    .view-toggle .btn {
+        flex: 1;
+    }
+
+    .calendario-contenedor {
+        max-height: 60vh;
+    }
+
+    .patient-card-header,
+    .history-item,
+    .history-empty {
+        grid-template-columns: 1fr;
+    }
+
+    .expediente-hero {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .expediente-summary-grid,
+    .patient-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .teeth-grid {
+        grid-template-columns: repeat(4, minmax(42px, 1fr));
+    }
 }
